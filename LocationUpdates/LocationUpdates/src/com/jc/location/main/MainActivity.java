@@ -2,6 +2,7 @@ package com.jc.location.main;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -33,11 +34,11 @@ import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationClient;
-import com.google.android.gms.location.LocationClient.OnRemoveGeofencesResultListener;
-import com.google.android.gms.location.LocationStatusCodes;
 import com.google.android.gms.location.LocationClient.OnAddGeofencesResultListener;
+import com.google.android.gms.location.LocationClient.OnRemoveGeofencesResultListener;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationStatusCodes;
 import com.jc.locationupdates.R;
 
 public class MainActivity extends FragmentActivity implements
@@ -114,8 +115,10 @@ public class MainActivity extends FragmentActivity implements
 	private PendingIntent mGeofenceRequestIntent;
 	
 	// Defines the allowable request types.
-    public enum REQUEST_TYPE {ADD , REMOVE_INTENT}
+    public enum REQUEST_TYPE {ADD , REMOVE_INTENT , REMOVE_LIST}
     private REQUEST_TYPE mRequestType;
+    // Store the list of geofence Ids to remove
+    private List<String> mGeofencesToRemove;
         
     // Flag that indicates if a request is underway.
 	private boolean mInProgress;
@@ -128,6 +131,8 @@ public class MainActivity extends FragmentActivity implements
 	private Button mAddressButton;
 
 	/* mCurrentLocation = mLocationClient.getLastLocation(); */
+	
+	
 
 	public static class ErrorDialogFragment extends DialogFragment {
 
@@ -364,6 +369,10 @@ public class MainActivity extends FragmentActivity implements
 			   mGeofenceRequestIntent = getTransitionPendingIntent();
 			   mLocationClient.removeGeofences(mGeofenceRequestIntent, this);
 			   break;
+		   case REMOVE_LIST :
+			   List<String> ListOfGeofences = Collections.singletonList("1");
+			   mLocationClient.removeGeofences(mGeofencesToRemove, this);
+			   break;
 		}
 	}
     
@@ -496,6 +505,31 @@ public class MainActivity extends FragmentActivity implements
              * request.
              */
 		}
+	}
+	
+	public void removeGeofences(List<String> geofenceIds){
+		
+		mRequestType = REQUEST_TYPE.REMOVE_LIST;
+		
+		if(!servicesConnected()){
+			return;
+		}
+		
+		mGeofencesToRemove = geofenceIds;
+		
+		mLocationClient = new LocationClient(this,this,this);
+		if(!mInProgress){
+			mInProgress = true;
+			mLocationClient.connect();
+		}else{
+			 /*
+             * A request is already underway. You can handle
+             * this situation by disconnecting the client,
+             * re-setting the flag, and then re-trying the
+             * request.
+             */
+		}
+		
 	}
 	
 	 /**
@@ -727,10 +761,34 @@ public class MainActivity extends FragmentActivity implements
 		mInProgress = false;
 		mLocationClient.disconnect();
 	}
-
+    
+	/**
+     * When the request to remove geofences by IDs returns, handle the
+     * result.
+     *
+     * @param statusCode The code returned by Location Services
+     * @param geofenceRequestIds The IDs removed
+     */
 	@Override
-	public void onRemoveGeofencesByRequestIdsResult(int arg0, String[] arg1) {
-		// TODO Auto-generated method stub
+	public void onRemoveGeofencesByRequestIdsResult(int statusCode, String[] requestGeofenceIds) {
 		
+		if(LocationStatusCodes.SUCCESS == statusCode){
+			 /*
+             * Handle successful removal of geofences here.
+             * You can send out a broadcast intent or update the UI.
+             * geofences into the Intent's extended data.
+             */
+		}else{
+			 // If removing the geofences failed
+            /*
+             * Report errors here.
+             * You can log the error using Log.e() or update
+             * the UI.
+             */
+		}
+		 // Indicate that a request is no longer in progress
+		mInProgress = false;
+		 // Disconnect the location client
+		mLocationClient.disconnect();
 	}
 }
