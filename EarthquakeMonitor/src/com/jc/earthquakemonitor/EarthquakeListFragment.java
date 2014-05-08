@@ -26,7 +26,6 @@ import android.os.Handler;
 import android.support.v4.app.ListFragment;
 import android.util.Log;
 import android.widget.ArrayAdapter;
-
 public class EarthquakeListFragment extends ListFragment{
     
 	ArrayAdapter<Quake> aa;
@@ -119,12 +118,18 @@ public class EarthquakeListFragment extends ListFragment{
 		}catch(SAXException e){
 			Log.d(TAG, "SAX Exception");
 		}finally{}
+	   
 	}
 	
 	private void addNewQuake(Quake quake){
-		earthquakes.add(quake);
+		EarthquakeActivity earthquakeActivity = (EarthquakeActivity)getActivity();
+		
+		if(quake.getMagnitude() > earthquakeActivity.minimumMagnitude)
+			earthquakes.add(quake);
+		
 		aa.notifyDataSetChanged();
 	}
+	
 	
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState){
@@ -143,4 +148,5 @@ public class EarthquakeListFragment extends ListFragment{
 		
 		t.start();
 	}
+	
 }

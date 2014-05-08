@@ -7,7 +7,7 @@
     <TextView android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/auto_update_prompt"/>
-    <Checkbox android:id="@+id/checkbox_auto_update"
+    <CheckBox android:id="@+id/checkbox_auto_update"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>
     <TextView android:layout_width="match_parent"
