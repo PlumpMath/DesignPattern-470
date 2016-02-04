@@ -18,6 +18,11 @@
         <meta-data android:name="com.google.android.gms.version"
            android:value="@integer/google_play_services_version" />
         
+        <service android:name="com.jc.location.main.ReceiveTransitionsIntentService"
+                 android:label="@string/app_name"
+                 android:exported="false">
+        </service>
+        
         <activity android:name="com.jc.location.main.MainActivity">
             <intent-filter >
                   <action android:name="android.intent.action.MAIN"/>
